@@ -57,7 +57,6 @@ commands:
             # # Delete backend stack
             # aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_id >>
 
-
   revert-migrations:
     description: Revert the last migration, if any were executed during the current workflow
     parameters:
@@ -219,7 +218,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}   # Here's where you will add some code to rollback on failure
+      # Here's where you will add some code to rollback on failure
 
   configure-infrastructure:
     docker:
@@ -239,8 +238,7 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment  # Here's where you will add some code to rollback on failure
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}   
+      - destroy-environment  # Here's where you will add some code to rollback on failure  
 
   run-migrations:
     docker:
@@ -269,9 +267,7 @@ jobs:
             fi
 # rolls back; should migration fail
       - destroy-environment
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations  
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy-frontend:
     docker:
@@ -306,9 +302,7 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 # rolls back; should migration fail
       - destroy-environment
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations 
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy-backend:
     docker:
@@ -349,9 +343,7 @@ jobs:
             ansible-playbook -vvv -i inventory.txt deploy-backend.yml
 # rolls back; should migration fail
       - destroy-environment
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations 
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   smoke-test:
     docker:
@@ -387,9 +379,7 @@ jobs:
             fi
 # rolls back; should migration fail
       - destroy-environment
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations  
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   cloudfront-update:
     docker:
@@ -423,9 +413,7 @@ jobs:
             echo Current Workflow ID: "${CIRCLE_WORKFLOW_ID:0:7}"
 # rolls back; should migration fail
       - destroy-environment
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations
-          # workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   cleanup:
     docker:                                                                           
