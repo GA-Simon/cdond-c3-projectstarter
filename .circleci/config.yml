@@ -471,77 +471,77 @@ jobs:
   #           fi
   #           done
 # =====================================================================================
-  configure-node-exporter:
-    docker:
-      # - image: amazon/aws-cli   #Executor
-      - image: cimg/python:3.10     #Executor    
-    steps:
-      - checkout
-      - install_ansible
-      - install_awscli
-      - add_ssh_keys:
-          fingerprints: ["d4:64:2b:23:8c:d9:0c:72:4e:7f:f7:1b:fa:81:6b:3e"]
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       yum update -y
-      #       yum install -y  tar gzip
-      #       curl -sL https://rpm.nodesource.com/setup_13.x | bash -
-      #       yum install -y nodejs
-      #       amazon-linux-extras install -y epel
-      #       yum install -y ansible
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Configure node_exporter
-          command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook configure-prometheus-node-exporter.yml -i inventory.txt
+  # configure-node-exporter:
+  #   docker:
+  #     # - image: amazon/aws-cli   #Executor
+  #     - image: cimg/python:3.10     #Executor    
+  #   steps:
+  #     - checkout
+  #     - install_ansible
+  #     - install_awscli
+  #     - add_ssh_keys:
+  #         fingerprints: ["d4:64:2b:23:8c:d9:0c:72:4e:7f:f7:1b:fa:81:6b:3e"]
+  #     # - run:
+  #     #     name: Install dependencies
+  #     #     command: |
+  #     #       yum update -y
+  #     #       yum install -y  tar gzip
+  #     #       curl -sL https://rpm.nodesource.com/setup_13.x | bash -
+  #     #       yum install -y nodejs
+  #     #       amazon-linux-extras install -y epel
+  #     #       yum install -y ansible
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Configure node_exporter
+  #         command: |
+  #           cd .circleci/ansible
+  #           cat inventory.txt
+  #           ansible-playbook configure-prometheus-node-exporter.yml -i inventory.txt
 
-  deploy-prometheus-server:
-    docker:
-      # - image: amazon/aws-cli    #Executor
-      - image: cimg/python:3.10         #Executor
-    steps:
-      - checkout
-      - install_ansible
-      - install_awscli
-      - add_ssh_keys:
-          fingerprints: ["d4:64:2b:23:8c:d9:0c:72:4e:7f:f7:1b:fa:81:6b:3e"]
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       yum update -y
-      #       yum install -y  tar gzip
-      #       curl -sL https://rpm.nodesource.com/setup_13.x | bash -
-      #       yum install -y nodejs
-      #       amazon-linux-extras install -y epel
-      #       yum install -y ansible
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Spin up EC2 server for prometheus
-          command: |
-            echo "[server]" >> .circleci/ansible/inventory.txt
-            aws cloudformation deploy \
-              --template-file .circleci/files/prometheus-server.yml \
-              --tags project=prometheus \
-              --stack-name udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
-      - run:
-          name: Append IP to inventory file
-          command: |
-            aws ec2 describe-instances \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters "Name=tag:project,Values=prometheus" \
-            --output text >> .circleci/ansible/inventory.txt
-      - run:
-          name: Install prometheus and alertmanager on server
-          command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt configure-prometheus-alertmanager.yml  
+  # deploy-prometheus-server:
+  #   docker:
+  #     # - image: amazon/aws-cli    #Executor
+  #     - image: cimg/python:3.10         #Executor
+  #   steps:
+  #     - checkout
+  #     - install_ansible
+  #     - install_awscli
+  #     - add_ssh_keys:
+  #         fingerprints: ["d4:64:2b:23:8c:d9:0c:72:4e:7f:f7:1b:fa:81:6b:3e"]
+  #     # - run:
+  #     #     name: Install dependencies
+  #     #     command: |
+  #     #       yum update -y
+  #     #       yum install -y  tar gzip
+  #     #       curl -sL https://rpm.nodesource.com/setup_13.x | bash -
+  #     #       yum install -y nodejs
+  #     #       amazon-linux-extras install -y epel
+  #     #       yum install -y ansible
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Spin up EC2 server for prometheus
+  #         command: |
+  #           echo "[server]" >> .circleci/ansible/inventory.txt
+  #           aws cloudformation deploy \
+  #             --template-file .circleci/files/prometheus-server.yml \
+  #             --tags project=prometheus \
+  #             --stack-name udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7} \
+  #             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
+  #     - run:
+  #         name: Append IP to inventory file
+  #         command: |
+  #           aws ec2 describe-instances \
+  #           --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #           --filters "Name=tag:project,Values=prometheus" \
+  #           --output text >> .circleci/ansible/inventory.txt
+  #     - run:
+  #         name: Install prometheus and alertmanager on server
+  #         command: |
+  #           cd .circleci/ansible
+  #           cat inventory.txt
+  #           ansible-playbook -i inventory.txt configure-prometheus-alertmanager.yml  
           
           
 workflows:
